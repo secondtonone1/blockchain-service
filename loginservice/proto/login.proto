@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package loginproto;
+//protoc   --proto_path=.  --micro_out=.  --go_out=. ./*.proto
+message LoginReq {
+    string name = 1;
+    string passwd = 2;
+}
+
+message LoginRsp {
+    int32 errid = 1;
+    string name = 2;
+}
+
+message RegUsrReq{
+    string name = 1;
+    string passwd = 2;
+}
+
+message RegUsrRsp{
+    int32 errid = 1;
+    string name = 2;
+}
+
+// 服务接口
+service UsrLogin {
+    rpc Login(LoginReq) returns (LoginRsp) {}
+    rpc RegisterUsr(RegUsrReq) returns (RegUsrRsp) {}
+}
+
+
+

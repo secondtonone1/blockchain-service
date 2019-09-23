@@ -1,0 +1,12 @@
+servicename:
+      loginservicename: login.srv.nm
+      dbservicename: db.srv.nm
+etcdconfig:
+      etcdnode1addr: 127.0.0.1:2379
+      etcdnode2addr: 127.0.0.1:3379
+      etcdnode3addr: 127.0.0.1:4379
+dbconfig:
+      dbname: lbass
+      dbuser: lemon
+      dbpswd: lemon123
+      dbport: 3306

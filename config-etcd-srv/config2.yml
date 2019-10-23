@@ -1,5 +1,5 @@
 name: etcd02
-data-dir: /home/secondtonone/workspace/goProject/src/lbaas/config-etcd-srv/data/etcd02
+data-dir: /home/secondtonone/workspace/goProject/src/blockchain-service/config-etcd-srv/data/etcd02
 listen-client-urls: http://127.0.0.1:3379
 advertise-client-urls: http://127.0.0.1:3379
 listen-peer-urls: http://127.0.0.1:2381
@@ -9,5 +9,5 @@ initial-cluster-token: etcd-cluster-1
 initial-cluster-state: new
 
 
-#etcd --config-file=/home/secondtonone/workspace/goProject/src/lbaas/config-etcd-srv/config2.yml
+#etcd --config-file=/home/secondtonone/workspace/goProject/src/blockchain-service/config-etcd-srv/config2.yml
 

@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	z "lbaas/plugins/zap"
+	z "blockchain-service/plugins/zap"
 
 	"go.uber.org/zap"
 )
@@ -71,7 +71,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	log.Info("[lbaas initConfig]")
+	log.Info("[blockchain-service initConfig]")
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)

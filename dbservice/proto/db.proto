@@ -15,16 +15,43 @@ message CheckLoginRsp{
 message RegisterUsrReq{
     string name = 1;
     string passwd = 2;
+    string email = 3;
 }
 
 message RegisterUsrRsp{
     int32 errid = 1;
     string name = 2;
+    string email = 3;
+}
 
+message ResetPwdReq{
+    string name = 1;
+    string passwd = 2;
+}
+
+message ResetPwdRsp{
+    int32 errid = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message CheckUsrEmailReq{
+    string name =1;
+    string email =2;
+}
+
+message CheckUsrEmailRsp{
+    int32 errid = 1;
+    string name = 2;
+    string email = 3;
 }
 
 // 服务接口
 service DBService {
     rpc CheckLogin(CheckLoginReq) returns (CheckLoginRsp) {}
     rpc RegisterUsr(RegisterUsrReq) returns(RegisterUsrRsp){}
+    rpc CheckUsrEmail(CheckUsrEmailReq) returns(CheckUsrEmailRsp){}
+    //修改密码
+    rpc ChangePwd(ResetPwdReq) returns(ResetPwdRsp) {}
+   
 }

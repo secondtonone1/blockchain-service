@@ -1,8 +1,8 @@
 package dbmanager
 
 import (
+	"blockchain-service/basic/config"
 	"fmt"
-	"lbaas/basic/config"
 	"sync"
 
 	"github.com/jinzhu/gorm"

@@ -1,9 +1,10 @@
 package dbtable
 
 import (
+	"errors"
 	"fmt"
 
-	"lbaas/dbservice/dbmanager"
+	"blockchain-service/dbservice/dbmanager"
 )
 
 func UsrBaseTblExist() bool {
@@ -28,8 +29,10 @@ func UsrBaseTblCreate() error {
 }
 
 type UsrBase struct {
-	Name   string `gorm:"primary_key;type:varchar(100);not null;unique"`
-	Passwd string `type:varchar(100);not null`
+	ID     int64  `gorm:"primary_key;AUTO_INCREMENT:number;unique"`
+	Name   string `gorm:"type:varchar(100);not null;unique"`
+	Passwd string `gorm:"type:varchar(100);not null"`
+	Email  string `gorm:"type:varchar(100);not null;unique"`
 }
 
 func UsrBaseTblInsert(usrbase *UsrBase) error {
@@ -75,6 +78,10 @@ func UsrBaseUnscoped(usrbase *UsrBase) error {
 }
 
 func UsrBaseTblUpdate(before *UsrBase, after *UsrBase) error {
+	if before.ID == 0 {
+		return errors.New("primary key is empty")
+	}
+
 	if err := dbmanager.GetDBMgrInst().GetOrmDB().Model(before).Updates(after).Error; err != nil {
 		fmt.Println("usr base update failed")
 		return err

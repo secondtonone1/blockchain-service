@@ -31,10 +31,11 @@ func main() {
 	service.Init()
 
 	lgClient := lgproto.NewUsrLoginService(config.GetCommonVipper().GetString("servicename.loginservicename"), service.Client())
-	rsp, err := lgClient.Login(context.Background(), &lgproto.LoginReq{Name: "lemon", Passwd: "lemon123"})
+	rsp, err := lgClient.Login(context.Background(), &lgproto.LoginReq{Name: config.GetCommonVipper().GetString("dbconfig.dbuser"),
+		Passwd: config.GetCommonVipper().GetString("dbconfig.dbpswd")})
 
 	if err != nil {
-		fmt.Println("login req failed!")
+		fmt.Println("login req failed!", err)
 		return
 	}
 
@@ -51,7 +52,7 @@ func main() {
 
 	if rsp.Errid == constdef.RSP_LOGINNAME_NOTFOUND {
 		fmt.Println("login usr name not found, name is ", rsp.Name)
-		rsp, err := lgClient.RegisterUsr(context.Background(), &lgproto.RegUsrReq{Name: "lemon", Passwd: "lemon123"})
+		rsp, err := lgClient.RegisterUsr(context.Background(), &lgproto.RegUsrReq{Name: "lemon", Passwd: "lemon123", Email: "lemon@163.com"})
 		if err != nil {
 			fmt.Println("register failed")
 			return

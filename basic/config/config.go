@@ -21,7 +21,7 @@ func GetCommonVipper() *viper.Viper {
 		commonvipper = viper.New()
 		commonvipper.SetConfigType("yaml")
 		commonvipper.SetConfigName("common")
-		commonvipper.AddConfigPath("$GOPATH/src/lbaas/basic/config")
+		commonvipper.AddConfigPath("$GOPATH/src/blockchain-service/basic/config")
 
 		if err := commonvipper.ReadInConfig(); err != nil {
 			fmt.Printf("err:%s\n", err)

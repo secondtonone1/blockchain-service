@@ -5,14 +5,12 @@ package loginproto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
+	math "math"
 )
 
 import (
 	context "context"
-
 	client "github.com/micro/go-micro/client"
 	server "github.com/micro/go-micro/server"
 )
@@ -38,6 +36,10 @@ var _ server.Option
 type UsrLoginService interface {
 	Login(ctx context.Context, in *LoginReq, opts ...client.CallOption) (*LoginRsp, error)
 	RegisterUsr(ctx context.Context, in *RegUsrReq, opts ...client.CallOption) (*RegUsrRsp, error)
+	//修改密码
+	ChangePasswd(ctx context.Context, in *ChangewdReq, opts ...client.CallOption) (*ChangewdRsp, error)
+	//修改密码确认
+	ChangePasswdConfirm(ctx context.Context, in *ChangewdCfmReq, opts ...client.CallOption) (*ChangewdCfmRsp, error)
 }
 
 type usrLoginService struct {
@@ -78,17 +80,43 @@ func (c *usrLoginService) RegisterUsr(ctx context.Context, in *RegUsrReq, opts .
 	return out, nil
 }
 
+func (c *usrLoginService) ChangePasswd(ctx context.Context, in *ChangewdReq, opts ...client.CallOption) (*ChangewdRsp, error) {
+	req := c.c.NewRequest(c.name, "UsrLogin.ChangePasswd", in)
+	out := new(ChangewdRsp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usrLoginService) ChangePasswdConfirm(ctx context.Context, in *ChangewdCfmReq, opts ...client.CallOption) (*ChangewdCfmRsp, error) {
+	req := c.c.NewRequest(c.name, "UsrLogin.ChangePasswdConfirm", in)
+	out := new(ChangewdCfmRsp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for UsrLogin service
 
 type UsrLoginHandler interface {
 	Login(context.Context, *LoginReq, *LoginRsp) error
 	RegisterUsr(context.Context, *RegUsrReq, *RegUsrRsp) error
+	//修改密码
+	ChangePasswd(context.Context, *ChangewdReq, *ChangewdRsp) error
+	//修改密码确认
+	ChangePasswdConfirm(context.Context, *ChangewdCfmReq, *ChangewdCfmRsp) error
 }
 
 func RegisterUsrLoginHandler(s server.Server, hdlr UsrLoginHandler, opts ...server.HandlerOption) error {
 	type usrLogin interface {
 		Login(ctx context.Context, in *LoginReq, out *LoginRsp) error
 		RegisterUsr(ctx context.Context, in *RegUsrReq, out *RegUsrRsp) error
+		ChangePasswd(ctx context.Context, in *ChangewdReq, out *ChangewdRsp) error
+		ChangePasswdConfirm(ctx context.Context, in *ChangewdCfmReq, out *ChangewdCfmRsp) error
 	}
 	type UsrLogin struct {
 		usrLogin
@@ -107,4 +135,12 @@ func (h *usrLoginHandler) Login(ctx context.Context, in *LoginReq, out *LoginRsp
 
 func (h *usrLoginHandler) RegisterUsr(ctx context.Context, in *RegUsrReq, out *RegUsrRsp) error {
 	return h.UsrLoginHandler.RegisterUsr(ctx, in, out)
+}
+
+func (h *usrLoginHandler) ChangePasswd(ctx context.Context, in *ChangewdReq, out *ChangewdRsp) error {
+	return h.UsrLoginHandler.ChangePasswd(ctx, in, out)
+}
+
+func (h *usrLoginHandler) ChangePasswdConfirm(ctx context.Context, in *ChangewdCfmReq, out *ChangewdCfmRsp) error {
+	return h.UsrLoginHandler.ChangePasswdConfirm(ctx, in, out)
 }

@@ -17,7 +17,7 @@ package cmd
 import (
 	"fmt"
 
-	"lbaas/dbservice/dbservice"
+	"blockchain-service/dbservice/dbservice"
 
 	"github.com/spf13/cobra"
 )

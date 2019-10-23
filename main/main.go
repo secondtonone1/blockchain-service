@@ -14,7 +14,7 @@
 
 package main
 
-import "lbaas/main/cmd"
+import "blockchain-service/main/cmd"
 
 func main() {
 	cmd.Execute()

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"blockchain-service/dbservice/dbmanager"
+	"blockchain-service/dbservice/dbtable"
 	"fmt"
-	"lbaas/dbservice/dbmanager"
-	"lbaas/dbservice/dbtable"
 )
 
 func main() {

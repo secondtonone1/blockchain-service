@@ -1,11 +1,12 @@
 package main
 
 import (
-	constdef "blockchain-service/basic/common"
-	"blockchain-service/basic/config"
-	lgproto "blockchain-service/loginservice/proto"
 	"context"
 	"fmt"
+	constdef "lbaas/basic/common"
+	lgproto "lbaas/loginservice/proto"
+
+	"lbaas/basic/config"
 
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
@@ -30,16 +31,25 @@ func main() {
 	service.Init()
 
 	lgClient := lgproto.NewUsrLoginService(config.GetCommonVipper().GetString("servicename.loginservicename"), service.Client())
-	rsp, err := lgClient.Login(context.Background(), &lgproto.LoginReq{Name: "Zack", Passwd: "123"})
+	rsp, err := lgClient.ChangePasswd(context.Background(), &lgproto.ChangewdReq{Name: "lemon", Email: "lemon@163.com"})
 
 	if err != nil {
-		fmt.Println("login req failed!")
+		fmt.Println("change passwd failed!")
+		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println("login req succss: msg is ")
-	fmt.Println("erroid is ", rsp.Errid)
-	if rsp.Errid == constdef.RSP_SUCCESS {
-		fmt.Println("name is ", rsp.Name)
+
+	if rsp.Errid == constdef.RSP_USERNAME_ERROR {
+		fmt.Println("user name error")
+		return
 	}
+
+	if rsp.Errid == constdef.RSP_EMAIL_ERROR {
+		fmt.Println("email  error")
+		return
+	}
+
+	fmt.Println("handle change passwd req success!")
+	return
 
 }

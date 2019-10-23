@@ -15,17 +15,47 @@ message LoginRsp {
 message RegUsrReq{
     string name = 1;
     string passwd = 2;
+    string email = 3;
 }
 
 message RegUsrRsp{
     int32 errid = 1;
     string name = 2;
+    string email = 3;
 }
+
+message ChangewdReq{
+    string name = 1;
+    string email = 2;
+}
+
+message ChangewdRsp{
+    int32 errid = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message ChangewdCfmReq{
+    string name = 1;
+    string email = 2;
+    string passwd =3;
+}
+
+message ChangewdCfmRsp{
+    int32 errid = 1;
+    string name = 2;
+    string email = 3;
+}
+
 
 // 服务接口
 service UsrLogin {
     rpc Login(LoginReq) returns (LoginRsp) {}
     rpc RegisterUsr(RegUsrReq) returns (RegUsrRsp) {}
+    //修改密码
+    rpc ChangePasswd(ChangewdReq) returns(ChangewdRsp) {}
+    //修改密码确认
+    rpc ChangePasswdConfirm(ChangewdCfmReq) returns(ChangewdCfmRsp) {}
 }
 
 

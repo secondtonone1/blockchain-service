@@ -1,8 +1,8 @@
 package main
 
 import (
+	"blockchain-service/basic/config"
 	"fmt"
-	"lbaas/basic/config"
 )
 
 func main() {

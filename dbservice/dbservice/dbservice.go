@@ -1,15 +1,16 @@
 package dbservice
 
 import (
+	constdef "blockchain-service/basic/common"
+	"blockchain-service/basic/config"
+	dbproto "blockchain-service/dbservice/proto"
 	"context"
 	"fmt"
-	constdef "lbaas/basic/common"
-	"lbaas/basic/config"
-	dbproto "lbaas/dbservice/proto"
+	"time"
 
-	"lbaas/dbservice/dbtable"
+	"blockchain-service/dbservice/dbtable"
 
-	"lbaas/dbservice/dbmanager"
+	"blockchain-service/dbservice/dbmanager"
 
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
@@ -21,7 +22,7 @@ type UsrDBImpl struct {
 }
 
 func (cl *UsrDBImpl) CheckLogin(ctx context.Context, in *dbproto.CheckLoginReq, out *dbproto.CheckLoginRsp) error {
-	fmt.Println("servicedb receive check login msg")
+	fmt.Println("servicedb receive check login msg", time.Now())
 	value, ok := cl.usrdata[in.Name]
 	if ok {
 		out.Name = in.Name
@@ -70,13 +71,14 @@ func (ru *UsrDBImpl) RegisterUsr(ctx context.Context, in *dbproto.RegisterUsrReq
 	if finderr == nil {
 		ru.usrdata[usrbase.Name] = usrbase
 		fmt.Printf("usr %s has found \n", in.Name)
-		out.Name = value.Name
+		out.Name = in.Name
 		out.Errid = constdef.RSP_USRHASREGED
 		return nil
 	}
 
 	usrbase.Name = in.Name
 	usrbase.Passwd = in.Passwd
+	usrbase.Email = in.Email
 	inserterr := dbtable.UsrBaseTblInsert(usrbase)
 	if inserterr != nil {
 		fmt.Printf("usr %s insert failed \n", in.Name)
@@ -84,11 +86,75 @@ func (ru *UsrDBImpl) RegisterUsr(ctx context.Context, in *dbproto.RegisterUsrReq
 		out.Errid = constdef.RSP_USRREG_FAILED
 		return inserterr
 	}
-
+	fmt.Println("usrbase usr id is ", usrbase.ID)
 	ru.usrdata[usrbase.Name] = usrbase
 	out.Name = usrbase.Name
 	out.Errid = constdef.RSP_SUCCESS
+	out.Email = usrbase.Email
 	return nil
+}
+
+func (h *UsrDBImpl) ChangePwd(ctx context.Context, in *dbproto.ResetPwdReq, out *dbproto.ResetPwdRsp) error {
+	value, ok := h.usrdata[in.Name]
+	if !ok {
+		temp := &dbtable.UsrBase{Name: in.Name}
+		findres := dbtable.UsrBaseTblFind(temp)
+		if findres != nil {
+			out.Name = in.Name
+			out.Errid = constdef.RSP_USERNAME_ERROR
+			fmt.Println("usr not found in db, name is ", in.Name)
+			return nil
+		}
+		h.usrdata[temp.Name] = temp
+		value = temp
+	}
+
+	value.Passwd = in.Passwd
+	upres := dbtable.UsrBaseTblUpdate(&dbtable.UsrBase{ID: value.ID, Name: value.Name}, value)
+	if upres != nil {
+		out.Name = in.Name
+		out.Email = value.Email
+		out.Errid = constdef.RSP_UPDATE_ERROR
+		return nil
+	}
+	out.Name = in.Name
+	out.Errid = constdef.RSP_SUCCESS
+	out.Email = value.Email
+	return nil
+}
+
+func (h *UsrDBImpl) CheckUsrEmail(ctx context.Context, in *dbproto.CheckUsrEmailReq, out *dbproto.CheckUsrEmailRsp) error {
+	value, ok := h.usrdata[in.Name]
+
+	if !ok {
+		temp := &dbtable.UsrBase{Name: in.Name}
+		findres := dbtable.UsrBaseTblFind(temp)
+		if findres != nil {
+			out.Name = in.Name
+			out.Email = in.Email
+			out.Errid = constdef.RSP_USERNAME_ERROR
+			fmt.Println("usr not found in db, name is ", in.Name)
+			return nil
+		}
+
+		h.usrdata[temp.Name] = temp
+		value = temp
+	}
+
+	if value.Email != in.Email {
+		fmt.Println("usr email : ", in.Email, " not found!")
+		out.Name = value.Name
+		out.Email = value.Email
+		out.Errid = constdef.RSP_EMAIL_ERROR
+		return nil
+	}
+
+	out.Name = value.Name
+	out.Email = value.Email
+	out.Errid = constdef.RSP_SUCCESS
+	fmt.Println("db check usr and email success!")
+	return nil
+
 }
 
 func newUsrDBImpl() *UsrDBImpl {
@@ -100,6 +166,7 @@ func newUsrDBImpl() *UsrDBImpl {
 
 func initTbls() {
 	dbtable.UsrBaseTblCreate()
+	dbtable.ProjectTblCreate()
 }
 
 func Start() {
@@ -113,9 +180,11 @@ func Start() {
 	// 我这里用的etcd 做为服务发现，如果使用consul可以去掉
 	reg := etcdv3.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{
+
 			config.GetCommonVipper().GetString("etcdconfig.etcdnode1addr"),
 			config.GetCommonVipper().GetString("etcdconfig.etcdnode2addr"),
 			config.GetCommonVipper().GetString("etcdconfig.etcdnode3addr"),
+			//"http://47.105.111.1:2379", "http://47.105.111.1:2379",
 		}
 	})
 
